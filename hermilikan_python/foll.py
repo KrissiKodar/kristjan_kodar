@@ -1,5 +1,51 @@
 import numpy as np
 
+""" class PID:
+    def __init__(self,setpoint,t_now,Kp=1,Ki=0,Kd=0):
+        self.setpoint = setpoint
+        self.t_last = t_now
+        self.Kp = Kp
+        self.Ki = Ki
+        self.Kd = Kd
+        self.last_desired_process = 0
+        self.last_error = 0
+        self.error_integrated = 0
+    def adjust(self,process,t_now):
+        error = self.setpoint - process
+        self.error_integrated += error
+
+        delta_time = t_now - self.t_last
+        #print(f'dt= {delta_time}')
+        
+        proportional = self.Kp * error
+        integral = self.Ki * self.error_integrated
+        #print(f'integral styri: {integral*180/np.pi}\n')
+        
+        #derivative = self.Kd * ((error - self.last_error) / (delta_time))
+        desired_process = proportional + integral #+ derivative
+        self.t_last = t_now
+        self.last_error = error
+        self.last_desired_process = desired_process
+        return desired_process
+    def sama_og_sidast(self):
+        return self.last_desired_process
+    def timecheck(self):
+        return self.t_last """
+
+class foo:
+    def __init__(self, t_now=0,styri=0):
+        self.t_last = t_now
+        self.styri_last= styri
+    def count_t(self,t_now):
+        self.t_last = t_now
+    def count_s(self,styri):
+        self.styri_last = styri 
+    def timecheck(self):
+        return self.t_last
+    def controlSave(self):
+        return self.styri_last
+            
+
 def Smtrx(a):
     a = a.flatten()
     S = np.array([   0,    -a[2],    a[1],
@@ -149,4 +195,17 @@ def R_I_tog(g,s):
 
     return R_IT
 
+# reikna togkraft i togvir
+def togkraftur(DeltaX, DeltaU, stifni, dempun, upphafleg_lengd):
+    nuverandi_lengd = np.linalg.norm(DeltaX)
+    if nuverandi_lengd > upphafleg_lengd:
+        Tow = np.array([stifni*(nuverandi_lengd-upphafleg_lengd)+np.squeeze(dempun*(
+        np.dot(DeltaU.T, (DeltaX/nuverandi_lengd)))), 0, 0]).reshape(3, 1)
+    else:
+        Tow = np.array([0, 0, 0]).reshape(3, 1)
+    return Tow
 
+def gamma_sigma(DeltaX):
+    gamma = np.arctan(DeltaX[2, 0]/DeltaX[0, 0])
+    sigma = np.arcsin(DeltaX[1, 0]/np.linalg.norm(DeltaX))
+    return gamma, sigma
