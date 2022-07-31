@@ -120,19 +120,4 @@ zeta4 = 8.0                # relative damping ratio in roll
 zeta5 = 1.0                # relative damping ratio in pitch
 T6 = 5.0                   # time constant in yaw (s)
 
-########  (initial conditions) ########
-""" x0 = np.array([TOW_hradi,  # u0
-               0,  # v0
-               0,  # w0
-               0,  # p0
-               0,  # q0
-               0,  # r0
-               0,  # x0
-               0,  # y0
-               0,  # z0
-               0,  # phi0
-               0,  # theta
-               0  # psi0
-               ]).reshape(12, 1) # error integration """
-
 TOW_hradi = 1.25

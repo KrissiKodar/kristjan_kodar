@@ -1,14 +1,10 @@
 import matplotlib.pyplot as plt
 import time
-
 from torch import roll
 from foll import *
 from fastar import *
 from RHS import *
-#from scipy.integrate import odeint
-
 from scipy.integrate import solve_ivp
-#from scipy import integrate
 import numpy as np
 import control as ct
 
@@ -17,51 +13,6 @@ warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 
 start_time = time.time()
 
-# ODE solver parameters
-abserr = 1.0e-6
-relerr = 1.0e-3
-stoptime = 100
-numpoints = stoptime*10
-sec_per_mini_bil = stoptime/numpoints
-
-# Create the time samples for the output of the ODE solver.
-# I use a large number of points, only because I want to make
-# a plot of the solution that looks nice.
-
-
-#t_points = [stoptime * float(i) / (numpoints - 1) for i in range(numpoints)]
-t_points = np.linspace(0, stoptime, numpoints+1)
-
-
-#controller = PID(setpoint=5*np.pi/180, t_now=t1, Kp=2, Ki=0, Kd=0.0)
-#max_vaeng_horn = 16 * np.pi/180
-#ref_roll = 5 * np.pi/180
-""" controller = PID(kp, ki, kd, setpoint=ref_roll, sample_time=None,
-                 output_limits=(-max_vaeng_horn, max_vaeng_horn)) """
-
-
-#cont=PID(setpoint=0,t_now=0,kp=kp,ki=ki,kd=kd,max_horn=16*np.pi/180)
-
-
-x0 = np.array([0,  # u0
-               0,  # v0
-               0,  # w0
-               0,  # p0
-               0,  # q0
-               0,  # r0
-               0,  # x0
-               0,  # y0
-               0,  # z0
-               0,  # phi0
-               0,  # theta
-               0  # psi0
-               ]).reshape(12, 1)  # error integration
-
-w0 = x0.flatten()
-
-# Call the ODE solver.
-#wsol = solve_ivp(varpa_dynamics,(0,stoptime), w0, t_eval = t_points, method='BDF', args = (kp, ki, kd, TOW_hradi,controller), atol=abserr, rtol=relerr)
-SOL = np.zeros((12,numpoints+1))
 
 ################################ plant #########################################
 
@@ -134,9 +85,6 @@ N = 1.0  # filter coefficient
 
 
 # Simulate the system
-#AA = np.split(np.ones(T.shape),2)
-#roll_ref = 5*np.pi/180*np.ones(T.shape)
-
 t1 = 37
 h1 =5./180. * np.pi
 
@@ -154,6 +102,7 @@ if t <= t3 else h1 * (t-t3) + h2 if t <= t3+1 else h3
 if t <= t4 else 0  for t in T]
 
 cl = False
+
 # closed loop
 if cl == True:
     t, y = ct.input_output_response(hermun, T, roll_ref, X0,solve_ivp_method="LSODA",params = {'kp':kp, 'ki':ki, 'kd':kd})
@@ -182,29 +131,6 @@ plt.show()
 print('\n')
 print("--- execution time: %s seconds ---" % (time.time() - start_time))
 print('\n')
-# print(wsol)
-
-# print('\n')
-
-# print(wsol.y[0])
-
-""" plt.figure(1, figsize=(6, 4.5))
-
-plt.xlabel('t')
-plt.grid(True)
-lw = 1
-
-
-plt.plot(wsol.t, wsol.y[9]*180/np.pi, 'b', linewidth=lw) """
-
-#plt.plot(t_points, SOL[9,:]*180/np.pi, 'b', linewidth=lw)
-
-
-#plt.plot(t_points, SOL[9,:]*180/np.pi, 'b', linewidth=lw)
-
-
-# print(wsol.y[9]*180/np.pi)
-
 
 """ fig, axs = plt.subplots(4, 3)
 axs[0, 0].plot(t, wsol[:, 0])
