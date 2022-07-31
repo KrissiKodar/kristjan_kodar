@@ -5,7 +5,7 @@ from simple_pid import PID
 #from numba import jit
 
 #@jit
-def vectorfield(t, x0, kp, ki, kd, TOW_hradi, controller, boo):
+def vectorfield(t, x0, kp, ki, kd, TOW_hradi, styrimerki):
     """ x0 : vector of state variables
         t  : time
     """
@@ -28,19 +28,6 @@ def vectorfield(t, x0, kp, ki, kd, TOW_hradi, controller, boo):
     #err = sp*np.pi/180 - eta[3, 0]
     
     # her er PID styringin
-    
-    if t > 37:
-        if boo.timecheck() == t:
-            styrimerki = boo.controlSave()
-        else:
-            #print(f't = {t}\n')
-            #print(f'boo.timecheck() = {boo.timecheck()}')
-            dt = 0.001
-            styrimerki = controller(eta[3, 0],dt=dt)
-            boo.count_s(styrimerki)
-            boo.count_t(t)
-    else:
-        styrimerki = 0
 
     ######################## saturation fyrir vaeng ###########################
     #max_afallshorn = 16  # degrees
