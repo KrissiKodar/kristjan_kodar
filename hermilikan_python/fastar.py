@@ -1,5 +1,4 @@
 import numpy as np
-
 breidd = 6.0  # breidd ramma
 haed = 3.0    # haed ramma
 

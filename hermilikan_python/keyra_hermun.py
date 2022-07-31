@@ -7,6 +7,7 @@ from RHS import *
 from scipy.integrate import solve_ivp
 import numpy as np
 from simple_pid import PID
+
 #import warnings
 #warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 
@@ -24,7 +25,7 @@ sec_per_mini_bil = stoptime/numpoints
 # a plot of the solution that looks nice.
 
 
-t_points = [stoptime * float(i) / (numpoints - 1) for i in range(numpoints)]
+#t_points = [stoptime * float(i) / (numpoints - 1) for i in range(numpoints)]
 t_points = np.linspace(0, stoptime, numpoints+1)
 
 
@@ -55,16 +56,17 @@ x0 = np.array([0,  # u0
                0  # psi0
                ]).reshape(12, 1)  # error integration
 
-w0 = x0.flatten().tolist()
+w0 = x0.flatten()
 
 # Call the ODE solver.
 #wsol = solve_ivp(vectorfield,(0,stoptime), w0, t_eval = t_points, method='BDF', args = (kp, ki, kd, TOW_hradi,controller), atol=abserr, rtol=relerr)
 SOL = np.zeros((12,numpoints+1))
 
 
-L_intv = 5
+L_intv = 2
 sec_per_stora_bil = sec_per_mini_bil*(L_intv-1)
 styrimerki = 0
+
 for i in range(int((len(t_points)-1)/L_intv)):
     a = L_intv*i
     b = L_intv*i+L_intv

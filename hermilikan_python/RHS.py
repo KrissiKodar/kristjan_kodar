@@ -262,6 +262,6 @@ def vectorfield(t, x0, kp, ki, kd, TOW_hradi, styrimerki):
     allt = tau + tau_liftdrag - C@nu_r - D@nu_r - g
 
     # State-space model
-    xdot = np.vstack((Dnu_c + inv_M@allt, J@nu)).flatten().tolist()
+    xdot = np.vstack((Dnu_c + inv_M@allt, J@nu)).flatten()
 
     return xdot
