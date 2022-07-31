@@ -1,41 +1,51 @@
 import numpy as n
 from fastar import *
 from foll import *
-from simple_pid import PID
+
 #from numba import jit
 
 #@jit
-def vectorfield(t, x0, kp, ki, kd, TOW_hradi, styrimerki):
+def varpa_dynamics(t, x0, u, params):
     """ x0 : vector of state variables
         t  : time
     """
-
     # State vectors and control inputs
     x = np.array(x0).reshape(12, 1)
 
     nu = x[0:6]
     eta = x[6:12]
 
-    # tegrud skekkja fyrir PID
-    #i_err = x[12, 0]
-
     # u1      # haegri vaengur
     # u2      # vinstri vaengur
-    # setpoint
-    sp = 5.0
-    
-    # her er reiknad skekkjuna milli setpoint og alvoru gildi a phi
-    #err = sp*np.pi/180 - eta[3, 0]
-    
-    # her er PID styringin
 
-    ######################## saturation fyrir vaeng ###########################
-    #max_afallshorn = 16  # degrees
+    #max_afallshorn = 16
 
-    u1 = styrimerki*180/np.pi
-    u2 = styrimerki*180/np.pi
-    #print(f'actual styrimerki = {u1}')
-    
+    u1 = u*180/np.pi
+    #print(u1)
+    # u1min = -max_afallshorn*pi/180
+    # u1max = max_afallshorn*pi/180
+    #
+    u2 = u*180/np.pi
+    # u2min = -max_afallshorn*pi/180
+    # u2max = max_afallshorn*pi/180
+
+    """ u1min = -max_afallshorn
+    u1max = max_afallshorn
+    u2min = -max_afallshorn
+    u2max = max_afallshorn
+
+    if u1 > u1max:
+        u1 = u1max
+    elif u1 < u1min:
+        u1 = u1min
+
+    if u2 > u2max:
+        u2 = u2max
+    elif u2 < u2min:
+        u2 = u2min """
+    #print(u1)
+
+
     ##########################################################################
     # Ocean currents expressed in BODY
 
@@ -48,8 +58,8 @@ def vectorfield(t, x0, kp, ki, kd, TOW_hradi, styrimerki):
     # Relative velocities/speed, angle of attack and vehicle speed
     nu_r = nu - nu_c                                 # relative velocity
 
-    # np.sqrt(nu_r[0]**2 + nu_r[1]**2 + nu_r[2]**2 )  # relative speed (m/s)
-    U_r = np.linalg.norm(nu_r)
+
+    U_r = np.linalg.norm(nu_r) # relative speed (m/s)
     # np.sqrt(nu[0]**2 + nu[1]**2 + nu[2]**2 )         # speed (m/s)
     #U = np.linalg.norm(nu)
 

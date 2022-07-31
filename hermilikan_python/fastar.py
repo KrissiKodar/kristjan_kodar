@@ -134,3 +134,5 @@ T6 = 5.0                   # time constant in yaw (s)
                0,  # theta
                0  # psi0
                ]).reshape(12, 1) # error integration """
+
+TOW_hradi = 1.25
