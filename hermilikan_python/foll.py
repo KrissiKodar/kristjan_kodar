@@ -21,6 +21,26 @@ def Smtrx(a):
     return S
  
 def m2c(M,nu):
+    """ 
+    C = m2c(M,nu) computes the Coriolis-centripetal matrix C(nu) from the
+    the system inertia matrix M > 0 for varying velocity nu. 
+    If M is a 6x6 matrix and nu = [u, v, w, p, q, r]', the output is a 6x6 C matrix
+
+    Examples: CRB = m2c(MRB,nu)     
+            CA  = m2c(MA, nu)
+    Output:
+    C         - Coriolis-centripetal matrix C = C(nu) 
+
+    Inputs:
+    M        - 6x6 or 3x3 rigid-body MRB or added mass MA system marix 
+    nu       - nu = [u, v, w, p, q, r]' or nu = [u, v, r]'
+
+    The Coriolis and centripetal matrix depends on nu1 = [u,v,w]' and nu2 =
+    [p,q,r]' as shown in Fossen (2021, Theorem 3.2). It is possible to
+    compute C = C(nu2) where nu2 = [p,q,r]' using the linear velocity-
+    independent representation, see 
+    """
+ 
     M = 0.5 * (M + M.T)      #symmetrization of the inertia matrix
     M11 = M[0:3,0:3]
     M12 = M[0:3,3:6]
@@ -38,7 +58,8 @@ def m2c(M,nu):
     return C
 
 def Dmtrx(T_126,zeta_45,MRB,MA,hydrostatics):
-    """ D = Dmtrx([T1, T2, T6],[zeta4,zeta5],MRB,MA,hydrostatics)
+    """ 
+    D = Dmtrx([T1, T2, T6],[zeta4,zeta5],MRB,MA,hydrostatics)
      computes the 6x6 linear damping matrix for marine craft (submerged and
      floating) by specifying the time constants [T1, T2, T6] in DOFs 1,2 and 6. 
      The time constants can be found by open-loop step responses. For roll and
@@ -79,7 +100,8 @@ def Dmtrx(T_126,zeta_45,MRB,MA,hydrostatics):
 
 def C_bf(alpha,beta):
     # 
-    """reiknar transformation matrix fra FLOW til BODY
+    """
+    reiknar transformation matrix fra FLOW til BODY
 
     Args:
         alpha (float): angle of attack
@@ -131,7 +153,8 @@ def Tzyx(phi,theta):
     return T
 
 def eulerang(phi,theta,psi):
-    """computes the Euler angle transformation matrix
+    """
+    computes the Euler angle transformation matrix
 
     Args:
         phi (float): roll
@@ -182,7 +205,8 @@ def gRvect(W,B,R,r_bg,r_bb):
     return g
 
 def gamma_sigma(DeltaX):
-    """reiknar hornin fyrir R_I_tog
+    """
+    reiknar hornin fyrir R_I_tog
 
     Args:
         DeltaX (3x1 vigur): munur a stadsetningu togvirs a ramma og hanastels
@@ -195,7 +219,8 @@ def gamma_sigma(DeltaX):
     return gamma, sigma
 
 def R_I_tog(g,s):
-    """coordinate transformation matrix fra togvir til ramma
+    """
+    coordinate transformation matrix fra togvir til ramma
 
     Args:
         g (float): horn sem lysir stefnu togvirs sja skyrslu
@@ -219,7 +244,8 @@ def R_I_tog(g,s):
 
 
 def togkraftur(DeltaX, DeltaU, stifni, dempun, upphafleg_lengd):
-    """reiknar togkraft i togvir i hnitakerfi togvirs
+    """
+    reiknar togkraft i togvir i hnitakerfi togvirs
     
     Args:
         DeltaX (3x1 vigur): munur a stadsetningu togvirs a ramma og hanastels

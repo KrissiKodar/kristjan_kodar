@@ -76,7 +76,6 @@ X0 = np.zeros(12)#[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]                 # Initial
 T = np.linspace(0, 6*60, 5000)   # Simulation 70 years of time
 
 
-
 kp = 1.0
 ki = 0.0
 kd = 0.0
