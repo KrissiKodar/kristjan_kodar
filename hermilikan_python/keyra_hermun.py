@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import time
-from torch import roll
 from foll import *
 from fastar import *
 from RHS import *
