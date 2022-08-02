@@ -6,7 +6,23 @@ from foll import *
 
 #@jit
 def varpa_dynamics(t, x0, u, params):
-    """ x0 : vector of state variables
+    """ x0 : vector of state variables 12x1
+    nu
+    #  u:       surge velocity          (m/s)
+    #  v:       sway velocity           (m/s)
+    #  w:       heave velocity          (m/s)
+    #  p:       roll rate               (rad/s)
+    #  q:       pitch rate              (rad/s)
+    #  r:       yaw rate                (rad/s)
+    
+    eta
+    #  x:       North position          (m)
+    #  y:       East position           (m)
+    #  z:       downwards position      (m)
+    #  phi:     roll angle              (rad)       
+    #  theta:   pitch angle             (rad)
+    #  psi:     yaw angle               (rad)
+
         t  : time
     """
     # State vectors and control inputs
@@ -18,18 +34,13 @@ def varpa_dynamics(t, x0, u, params):
     # u1      # haegri vaengur
     # u2      # vinstri vaengur
 
-    #max_afallshorn = 16
+    max_afallshorn = 16
 
     u1 = u*180/np.pi
-    #print(u1)
-    # u1min = -max_afallshorn*pi/180
-    # u1max = max_afallshorn*pi/180
-    #
     u2 = u*180/np.pi
-    # u2min = -max_afallshorn*pi/180
-    # u2max = max_afallshorn*pi/180
 
-    """ u1min = -max_afallshorn
+
+    u1min = -max_afallshorn
     u1max = max_afallshorn
     u2min = -max_afallshorn
     u2max = max_afallshorn
@@ -42,8 +53,8 @@ def varpa_dynamics(t, x0, u, params):
     if u2 > u2max:
         u2 = u2max
     elif u2 < u2min:
-        u2 = u2min """
-    #print(u1)
+        u2 = u2min
+
 
 
     ##########################################################################
