@@ -182,12 +182,16 @@ def varpa_dynamics(t, x0, u, params):
         # TOGVIRAR[i][0] stadsetning togvirs vid ramma i body-frame
         # TOGVIRAR[i][i] upphafleg lengd togvirs
 
+        ### stadsetning og hradi tengipunkt togvirs a ramma
         H_X = o_b + R@(TOGVIRAR[i][0])
         H_U = R@(np.cross(nu_r[3:6], TOGVIRAR[i][0], axis=0)+nu_r[0:3])
         
+        # munur a stadsetningu togvirs a ramma og hanastels
         DeltaX = pos_X - H_X
+        # munur a hrada togvirs a ramma og hanastels
         DeltaU = TOW_U - H_U
 
+        # reikna krafta fra togvirum
         Tow = togkraftur(DeltaX,DeltaU,togvir_stifni,dempun_togvir,TOGVIRAR[i][1])
         gamma, sigma = gamma_sigma(DeltaX)
         RCableToInertial = R_I_tog(gamma, sigma)
