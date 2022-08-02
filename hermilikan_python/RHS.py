@@ -43,10 +43,10 @@ def vectorfield(x0, t, kp, ki, kd):
     
     # her er reiknad skekkjuna milli setpoint og alvoru gildi a phi
     err = sp*np.pi/180 - eta[3, 0]
-    #d_err = err - error_listi[-1]
-    #error_listi.append(err)
+    d_err = err - error_listi[-1]
+    error_listi.append(err)
     # her er PID styringin
-    styrimerki = kp*err#+ki*i_err
+    styrimerki = kp*err+ki*i_err
     
     u1 = styrimerki
     u2 = u1
