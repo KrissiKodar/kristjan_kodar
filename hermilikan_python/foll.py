@@ -149,4 +149,17 @@ def R_I_tog(g,s):
 
     return R_IT
 
+# reikna togkraft i togvir
+def togkraftur(DeltaX, DeltaU, stifni, dempun, upphafleg_lengd):
+    nuverandi_lengd = np.linalg.norm(DeltaX)
+    if nuverandi_lengd > upphafleg_lengd:
+        Tow = np.array([stifni*(nuverandi_lengd-upphafleg_lengd)+np.squeeze(dempun*(
+        np.dot(DeltaU.T, (DeltaX/nuverandi_lengd)))), 0, 0]).reshape(3, 1)
+    else:
+        Tow = np.array([0, 0, 0]).reshape(3, 1)
+    return Tow
 
+def gamma_sigma(DeltaX):
+    gamma = np.arctan(DeltaX[2, 0]/DeltaX[0, 0])
+    sigma = np.arcsin(DeltaX[1, 0]/np.linalg.norm(DeltaX))
+    return gamma, sigma
