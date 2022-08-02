@@ -84,7 +84,7 @@ N = 1.0  # filter coefficient
 
 
 # Simulate the system
-temp = False
+temp = True
 if temp == True:
     t1 = 37
     h1 =5./180. * np.pi
@@ -132,12 +132,12 @@ else:
     plt.legend()
     plt.grid(True)
 
-plt.show()
 
 print('\n')
 print("--- execution time: %s seconds ---" % (time.time() - start_time))
 print('\n')
 
+plt.show()
 
 
 

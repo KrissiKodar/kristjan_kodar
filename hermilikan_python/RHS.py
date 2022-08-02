@@ -34,12 +34,10 @@ def varpa_dynamics(t, x0, u, params):
     # u1      # haegri vaengur
     # u2      # vinstri vaengur
 
-    max_afallshorn = 16
-
     u1 = u*180/np.pi
     u2 = u*180/np.pi
 
-
+    max_afallshorn = 16
     u1min = -max_afallshorn
     u1max = max_afallshorn
     u2min = -max_afallshorn
@@ -55,8 +53,6 @@ def varpa_dynamics(t, x0, u, params):
     elif u2 < u2min:
         u2 = u2min
 
-
-
     ##########################################################################
     # Ocean currents expressed in BODY
 
@@ -71,7 +67,6 @@ def varpa_dynamics(t, x0, u, params):
 
 
     U_r = np.linalg.norm(nu_r) # relative speed (m/s)
-    # np.sqrt(nu[0]**2 + nu[1]**2 + nu[2]**2 )         # speed (m/s)
     #U = np.linalg.norm(nu)
 
     alpha = np.arctan2(nu_r[2, 0], nu_r[0, 0])   # angle of attack (rad)
@@ -93,9 +88,7 @@ def varpa_dynamics(t, x0, u, params):
     CA[5, 0] = 0.0
     CA[5, 1] = 0.0
 
-    #M = MRB + MA
     C = CRB + CA
-    # m = MRB[0,0]
     W = massi_heild*gravity_a
     B = ratio_Buoy_weight*W  # ef B = W tha "neutrally buoyant"
 
@@ -107,14 +100,16 @@ def varpa_dynamics(t, x0, u, params):
 
     ################### straumfraedilegir kraftar a net #######################
 
-    # gefum okkur ad midad vid flaedi se bara dragkraftur
+    # gefum okkur ad midad vid flaedi se bara dragkraftur (-x att i flow axis)
     tau_liftdrag = np.array([-q*(flatarmal_op_vorpu)*Cd_net_og_rest, 0, 0]).reshape(3, 1)  # flow axis
 
-    tau_liftdrag = C_bf(alpha, beta)@tau_liftdrag  # breyta i body axis
+    # breyta i body axis
+    tau_liftdrag = C_bf(alpha, beta)@tau_liftdrag
 
-    # verkar i dragmidju
+    # straumfraedilegi krafturinn latinn verka i dragmidju, thad kemur thvi vaegi fra honum
     M_fra_neti = np.cross(dragmidja_b, tau_liftdrag, axis=0)
 
+    # straumfraedilegi kraftur og vaegi sett i einn vigur
     tau_liftdrag = np.vstack((tau_liftdrag, M_fra_neti))
 
     ###########################################################################
@@ -123,19 +118,15 @@ def varpa_dynamics(t, x0, u, params):
     [J, R, T_tf] = eulerang(eta[3, 0], eta[4, 0], eta[5, 0])
 
     # Restoring forces and moments (thyngd, flotkraftur, massamidja, flotmidja)
-
     g = gRvect(W, B, R, CGravity_wrt_CO, CBuoyancy_wrt_CO)
 
     ###########################################################################
 
     ################# kraftar og vaegi fra vaengjum (i b-frame) ###############
-    ################# gera betur her )  ######################################
-
-    # beta = 0
 
     # haegri vaengur relative speed
     v_haegri = np.cross(nu_r[3:6], haegri_vaengur_stadsetning_b, axis=0)+nu_r[0:3]
-    # v_haegri[0:2]
+
     U_r_haegri = np.linalg.norm(v_haegri[0:2])
     q_hv = 1/2 * rho_vatn * U_r_haegri**2
 
@@ -166,7 +157,6 @@ def varpa_dynamics(t, x0, u, params):
                    -q_vv * A_vaengur * C_L_alph_vv]).reshape(3, 1)  # lift force
 
     # transformation fra FLOW til BODY
-
     F1 = C_bf(hv_alpha*np.pi/180, beta)@F1
     F2 = C_bf(vv_alpha*np.pi/180, beta)@F2
 
@@ -174,105 +164,52 @@ def varpa_dynamics(t, x0, u, params):
 
     # vaegi fra vaengjum (a ad vera um cg, center of gravity)
 
-    # haegri
-    lever_vh = haegri_vaengur_stadsetning_b
+    Mh = np.cross(haegri_vaengur_stadsetning_b, F1, axis=0)
+    Mv = np.cross(vinstri_vaengur_statsetning_b, F2, axis=0)
 
-    # vinstri
-    lever_vv = vinstri_vaengur_statsetning_b
-
-    Mh = np.cross(lever_vh, F1, axis=0)
-    Mv = np.cross(lever_vv, F2, axis=0)
 
     ############################## togvira kraftar ############################
 
-    # stadsetning o_b
+    # stadsetning o_b (origin of body coordinate system in inertial frame)
     o_b = eta[0:3]
-
-    HO_X = o_b + R@stadsetning_togvir_haegri_ofan_b
-    HN_X = o_b + R@stadsetning_togvir_haegri_nedan_b
-    VO_X = o_b + R@stadsetning_togvir_vinstri_ofan_b
-    VN_X = o_b + R@stadsetning_togvir_vinstri_nedan_b
-
-    # xyz_hnit = np.vstack((HO_X, HN_X, VO_X, VN_X))
-
-    #rammi_xyz_hnit = np.vstack(
-    #    (o_b + R@R_HO, o_b + R@R_HN,  o_b + R@R_VO, o_b + R@R_VN))
-
-    HO_U = R@(np.cross(nu_r[3:6], stadsetning_togvir_haegri_ofan_b, axis=0)+nu_r[0:3])
-    HN_U = R@(np.cross(nu_r[3:6], stadsetning_togvir_haegri_nedan_b, axis=0)+nu_r[0:3])
-    VO_U = R@(np.cross(nu_r[3:6], stadsetning_togvir_vinstri_ofan_b, axis=0)+nu_r[0:3])
-    VN_U = R@(np.cross(nu_r[3:6], stadsetning_togvir_vinstri_nedan_b, axis=0)+nu_r[0:3])
-
     pos_tow = TOW_hradi*t
-
     pos_X = np.array([pos_tow, 0, 0]).reshape(3, 1) + stadsetning_hanafots_i_byrjun_b
-
-    DeltaX1 = pos_X - HO_X
-    DeltaX2 = pos_X - HN_X
-    DeltaX3 = pos_X - VO_X
-    DeltaX4 = pos_X - VN_X
-
     TOW_U = np.array([TOW_hradi, 0, 0]).reshape(3, 1)
 
-    DeltaU1 = TOW_U - HO_U
-    DeltaU2 = TOW_U - HN_U
-    DeltaU3 = TOW_U - VO_U
-    DeltaU4 = TOW_U - VN_U
+    ALL_TOW_FORCES = np.zeros(3).reshape(3,1)
+    ALL_TOW_MOMENTS = np.zeros(3).reshape(3,1)
+    for i in range(len(TOGVIRAR)):
+        # TOGVIRAR[i][0] stadsetning togvirs vid ramma i body-frame
+        # TOGVIRAR[i][i] upphafleg lengd togvirs
 
-    ####################### togkraftar i cable frame #########################
-    Tow_1 = togkraftur(DeltaX1,DeltaU1,efri_togvir_stifni,dempun_togvir,upphafleg_L_efri_togvira)
-    Tow_2 = togkraftur(DeltaX2,DeltaU2,nedri_togvir_stifni,dempun_togvir,upphafleg_L_nedri_togvira)
-    Tow_3 = togkraftur(DeltaX3,DeltaU3,efri_togvir_stifni,dempun_togvir,upphafleg_L_efri_togvira)
-    Tow_4 = togkraftur(DeltaX4,DeltaU4,nedri_togvir_stifni,dempun_togvir,upphafleg_L_nedri_togvira)
+        H_X = o_b + R@(TOGVIRAR[i][0])
+        H_U = R@(np.cross(nu_r[3:6], TOGVIRAR[i][0], axis=0)+nu_r[0:3])
+        
+        DeltaX = pos_X - H_X
+        DeltaU = TOW_U - H_U
 
-    ####### Cable to inertial rotation matrix reikningar #######
-    gamma1, sigma1 = gamma_sigma(DeltaX1)
-    gamma2, sigma2 = gamma_sigma(DeltaX2)
-    gamma3, sigma3 = gamma_sigma(DeltaX3)
-    gamma4, sigma4 = gamma_sigma(DeltaX4)
+        Tow = togkraftur(DeltaX,DeltaU,togvir_stifni,dempun_togvir,TOGVIRAR[i][1])
+        gamma, sigma = gamma_sigma(DeltaX)
+        RCableToInertial = R_I_tog(gamma, sigma)
 
+        ######## kraftar i togvirum yfirfaerdir i body frame ########
+        Tow = R.T@(RCableToInertial@Tow)
+        M_Tow = np.cross(TOGVIRAR[i][0], Tow, axis=0)
 
-    RCableToInertial1 = R_I_tog(gamma1, sigma1)
-    RCableToInertial2 = R_I_tog(gamma2, sigma2)
-    RCableToInertial3 = R_I_tog(gamma3, sigma3)
-    RCableToInertial4 = R_I_tog(gamma4, sigma4)
+        ##### thyngd togvira #####
+        m_togvir = 0.98*TOGVIRAR[i][1]/2  # deili med 2, skipt a milli tp og ramma
+        thyngd_togvir = R.T@np.array([0, 0, m_togvir*gravity_a]).reshape(3, 1)
+        vaegi_thyngd_togvir = np.cross(TOGVIRAR[i][0], thyngd_togvir, axis=0)
 
-    #############################################################
-
-    ######## kraftar i togvirum yfirfaerdir i body frame ########
-    Tow_1 = R.T@(RCableToInertial1@Tow_1)
-    Tow_2 = R.T@(RCableToInertial2@Tow_2)
-    Tow_3 = R.T@(RCableToInertial3@Tow_3)
-    Tow_4 = R.T@(RCableToInertial4@Tow_4)
-    ################### vaegi reikningar #########################
-    M_TOW_1 = np.cross(stadsetning_togvir_haegri_ofan_b, Tow_1, axis=0)
-    M_TOW_2 = np.cross(stadsetning_togvir_haegri_nedan_b, Tow_2, axis=0)
-    M_TOW_3 = np.cross(stadsetning_togvir_vinstri_ofan_b, Tow_3, axis=0)
-    M_TOW_4 = np.cross(stadsetning_togvir_vinstri_nedan_b, Tow_4, axis=0)
-
-    TOW = Tow_1 + Tow_2 + Tow_3 + Tow_4
-    M_TOW = M_TOW_1 + M_TOW_2 + M_TOW_3 + M_TOW_4
-
-    ##### thyngd togvira #####
-    mo = 0.98*upphafleg_L_efri_togvira/2  # deili med 2, skipt a milli tp og ramma
-    mn = 0.98*upphafleg_L_nedri_togvira/2
-
-    thyngd_o = R.T@np.array([0, 0, mo*gravity_a]).reshape(3, 1)
-    thyngd_n = R.T@np.array([0, 0, mn*gravity_a]).reshape(3, 1)
-
-    TOW = TOW + 2*thyngd_o + 2*thyngd_n
-
-    m_HO_th = np.cross(stadsetning_togvir_haegri_ofan_b, thyngd_o, axis=0)
-    m_HN_th = np.cross(stadsetning_togvir_haegri_nedan_b, thyngd_n, axis=0)
-    m_VO_th = np.cross(stadsetning_togvir_vinstri_ofan_b, thyngd_o, axis=0)
-    m_VN_th = np.cross(stadsetning_togvir_vinstri_nedan_b, thyngd_n, axis=0)
-
-    M_TOW = M_TOW + m_HO_th + m_HN_th + m_VO_th + m_VN_th
+        ALL_TOW_FORCES += Tow + thyngd_togvir
+        ALL_TOW_MOMENTS += M_Tow + vaegi_thyngd_togvir
+    
+    
     #################### allt plusad saman her ################################
 
-    F_heild = Fv + TOW
+    F_heild = Fv + ALL_TOW_FORCES
 
-    M_heild = Mh + Mv + M_TOW
+    M_heild = Mh + Mv + ALL_TOW_MOMENTS
 
     tau = np.vstack((F_heild, M_heild))
 

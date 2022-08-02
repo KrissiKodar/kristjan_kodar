@@ -42,6 +42,10 @@ togvir_young_modulus = 105*10**9   # Youngs studull Pa (stal cable)
 tvhermal_togvir = 0.05             # thvermal togvir m
 thverskurdsflatarmal_togvirs = np.pi*(tvhermal_togvir/2)**2  # flatarmal togvir m**2
 rho_togvir = 7800.0      # edlismassi togvir kg/m**3
+
+# togvira stifni
+togvir_stifni = 1.82*10**7  # E*Av/L
+
 k_damp = 1.5             # fra modeling and control of trawl systems
 dempun_togvir = k_damp*thverskurdsflatarmal_togvirs*np.sqrt(togvir_young_modulus*rho_togvir)
 #dempun_togvir = 85000
@@ -74,8 +78,11 @@ vinstri_vaengur_statsetning_b = np.array([corr_f, breidd/2-0.4-1.1, -haed/2]).re
 ################## stadsetningar togvira #####################
 
 
-# stadsetning TP i byrjun m.v. o_b
+# stadsetning hanafots (tengipunkts togvira) fra midju ramma i byrjun hermunar
 stadsetning_hanafots_i_byrjun_b = np.array([9, 0, -4]).reshape(3, 1)
+
+
+# haegt ad baeta vid togvirum (eda faekka) her
 
 # haegri ofan
 stadsetning_togvir_haegri_ofan_b = np.array([corr_f, -breidd/4, -haed/2]).reshape(3, 1)
@@ -87,14 +94,18 @@ stadsetning_togvir_vinstri_ofan_b = np.array([corr_f, breidd/4, -haed/2]).reshap
 stadsetning_togvir_vinstri_nedan_b = np.array([0, breidd/2, 0]).reshape(3, 1)
 
 # upphafleg lengd efri togvira
-upphafleg_L_efri_togvira = np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_ofan_b)
+#upphafleg_L_efri_togvira = np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_ofan_b)
 
 # upphafleg lengd nedri togvira
-upphafleg_L_nedri_togvira = np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_nedan_b)
+#upphafleg_L_nedri_togvira = np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_nedan_b)
 
-# togvira stifni
-efri_togvir_stifni = 1.82*10**7  # E*Av/L0_O
-nedri_togvir_stifni = 1.82*10**7  # E*Av/L0_N
+
+#####  TOGVIRAR = ( (stadsetning togvirs a ramma i body frame, upphafleg lengd togvirs ) , ...)
+TOGVIRAR =((stadsetning_togvir_haegri_ofan_b,    np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_ofan_b)),
+            (stadsetning_togvir_haegri_nedan_b, np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_nedan_b)),
+            (stadsetning_togvir_vinstri_ofan_b, np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_vinstri_ofan_b)),
+            (stadsetning_togvir_vinstri_nedan_b,np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_vinstri_nedan_b)))
+
 
 ####### straumfraedi studlar ######
 
