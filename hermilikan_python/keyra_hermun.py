@@ -80,7 +80,6 @@ X0 = np.array([TOW_hradi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])               # Init
 T = np.linspace(0, heildartimi, number_of_solution_points)   # Simulation 70 years of time
 
 
-
 kp = 1.0
 ki = 0.0
 kd = 0.0
