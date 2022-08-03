@@ -5,30 +5,114 @@ haed = 3.0    # haed ramma
 m_eining = 80.0    # massi einnar einingar af ramma
 aukamassi = 150.0  # massi frá öðru en rammanum sjálfum
 
+corr_f = 0.0  # -0.5    # stillir adeins upphafsstellingu vorpu
 
-### ath aukamassinn er ekki med (ma baeta vid)
-Ixx = 2*(1/12*((breidd/3)*m_eining)*breidd**2+((breidd/3)*m_eining)*(haed/2)**2) + \
-    2*(1/12*(breidd/3)*m_eining*haed**2+(haed/3)*m_eining*(breidd/2)**2)
+# stadsetning hanafots (tengipunkts togvira) fra midju ramma i byrjun hermunar
+stadsetning_hanafots_i_byrjun_b = np.array([9, 0, -4]).reshape(3, 1)
 
-Iyy = 2*(1/12*(haed/3)*m_eining*haed**2)+2*(((breidd/3)*m_eining)*(haed/2)**2)
+RAMMI = False
+STONG = True
 
-Izz = 2*(1/12*((breidd/3)*m_eining)*breidd**2)+2*((haed/3)*m_eining*(breidd/2)**2)
+if RAMMI:
+    ### ath aukamassinn er ekki med (ma baeta vid)
+    Ixx = 2*(1/12*((breidd/3)*m_eining)*breidd**2+((breidd/3)*m_eining)*(haed/2)**2) + \
+        2*(1/12*(breidd/3)*m_eining*haed**2+(haed/3)*m_eining*(breidd/2)**2)
 
-hverfitregduthinur = np.array([[Ixx, 0, 0, 0, Iyy, 0, 0, 0, Izz]]).reshape(3, 3)
+    Iyy = 2*(1/12*(haed/3)*m_eining*haed**2)+2*(((breidd/3)*m_eining)*(haed/2)**2)
 
+    Izz = 2*(1/12*((breidd/3)*m_eining)*breidd**2)+2*((haed/3)*m_eining*(breidd/2)**2)
 
-massi_heild = 2*(breidd/3)*m_eining + 2*(haed/3)*m_eining + aukamassi
-
-MRB = np.block([[massi_heild*np.eye(3), np.zeros((3, 3))],
-                [np.zeros((3, 3)), hverfitregduthinur]])
-
-MA = 0.15*MRB  # + 15 # added mass
-
-M = MRB + MA
-
-inv_M = np.linalg.inv(M)
+    hverfitregduthinur = np.array([[Ixx, 0, 0, 0, Iyy, 0, 0, 0, Izz]]).reshape(3, 3)
 
 
+    massi_heild = 2*(breidd/3)*m_eining + 2*(haed/3)*m_eining + aukamassi
+
+    MRB = np.block([[massi_heild*np.eye(3), np.zeros((3, 3))],
+                    [np.zeros((3, 3)), hverfitregduthinur]])
+
+    MA = 0.15*MRB  # + 15 # added mass
+
+    M = MRB + MA
+
+    inv_M = np.linalg.inv(M)
+
+    # rammi hnit
+    # haegri ofan
+    R_HO = np.array([corr_f, -breidd/2, -haed/2]).reshape(3, 1)
+    # haegri nedan
+    R_HN = np.array([0, -breidd/2, haed/2]).reshape(3, 1)
+    # vinstri ofan
+    R_VO = np.array([corr_f, breidd/2, -haed/2]).reshape(3, 1)
+    # vinstri nedan
+    R_VN = np.array([0, breidd/2, haed/2]).reshape(3, 1)
+
+    # haegri vaengur fjarlaegd fra CO (center of body coordinate system)
+    haegri_vaengur_stadsetning_b = np.array([corr_f, -breidd/2+0.4+1.1, -haed/2]).reshape(3, 1)
+
+    # vinstri vaengur fjarlaegd fra CO
+    vinstri_vaengur_statsetning_b = np.array([corr_f, breidd/2-0.4-1.1, -haed/2]).reshape(3, 1)
+
+    # haegri ofan
+    stadsetning_togvir_haegri_ofan_b = np.array([corr_f, -breidd/4, -haed/2]).reshape(3, 1)
+    # haegri nedan
+    stadsetning_togvir_haegri_nedan_b = np.array([0, -breidd/2, 0]).reshape(3, 1)
+    # vinstri ofan
+    stadsetning_togvir_vinstri_ofan_b = np.array([corr_f, breidd/4, -haed/2]).reshape(3, 1)
+    # vinstri nedan
+    stadsetning_togvir_vinstri_nedan_b = np.array([0, breidd/2, 0]).reshape(3, 1)
+
+    #####  TOGVIRAR = ( (stadsetning togvirs a ramma i body frame, upphafleg lengd togvirs ) , ...)
+    TOGVIRAR =((stadsetning_togvir_haegri_ofan_b,    np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_ofan_b)),
+                (stadsetning_togvir_haegri_nedan_b, np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_nedan_b)),
+                (stadsetning_togvir_vinstri_ofan_b, np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_vinstri_ofan_b)),
+                (stadsetning_togvir_vinstri_nedan_b,np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_vinstri_nedan_b)))
+
+if STONG:
+    thykkt_stong = 0.4
+    ### ath aukamassinn er ekki med (ma baeta vid)
+    Ixx = (1/12)*(breidd/3)*m_eining*breidd**2
+
+    Iyy = (1/2)*(breidd/3)*m_eining*thykkt_stong**2
+
+    Izz = Ixx
+
+    hverfitregduthinur = np.array([[Ixx, 0, 0, 0, Iyy, 0, 0, 0, Izz]]).reshape(3, 3)
+
+    massi_heild = (breidd/3)*m_eining + aukamassi
+
+    MRB = np.block([[massi_heild*np.eye(3), np.zeros((3, 3))],
+                    [np.zeros((3, 3)), hverfitregduthinur]])
+
+    MA = 0.15*MRB  # + 15 # added mass
+
+    M = MRB + MA
+
+    inv_M = np.linalg.inv(M)
+
+    # stong hnit
+    # haegri 
+    R_H = np.array([corr_f, -breidd/2, 0]).reshape(3, 1)
+    # vinstri 
+    R_V = np.array([corr_f, breidd/2, 0]).reshape(3, 1)
+
+
+    # haegri vaengur fjarlaegd fra CO (center of body coordinate system)
+    haegri_vaengur_stadsetning_b = np.array([corr_f, -breidd/2+0.4+1.1, 0]).reshape(3, 1)
+
+    # vinstri vaengur fjarlaegd fra CO
+    vinstri_vaengur_statsetning_b = np.array([corr_f, breidd/2-0.4-1.1, 0]).reshape(3, 1)
+
+    # haegri ofan
+    stadsetning_togvir_haegri_b = np.array([corr_f, -breidd/4, 0]).reshape(3, 1)
+    # vinstri ofan
+    stadsetning_togvir_vinstri_b = np.array([corr_f, breidd/4, 0]).reshape(3, 1)
+
+    #####  TOGVIRAR = ( (stadsetning togvirs a ramma i body frame, upphafleg lengd togvirs ) , ...)
+    TOGVIRAR =((stadsetning_togvir_haegri_b,    np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_b)),
+                (stadsetning_togvir_vinstri_b, np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_vinstri_b)))
+
+print(M)
+#### Almennt ####
 flatarmal_op_vorpu = breidd*haed  # flatarmal op vorpu m**2
 
 # fleiri fastar
@@ -50,62 +134,10 @@ k_damp = 1.5             # fra modeling and control of trawl systems
 dempun_togvir = k_damp*thverskurdsflatarmal_togvirs*np.sqrt(togvir_young_modulus*rho_togvir)
 #dempun_togvir = 85000
 
-corr_f = 0.0  # -0.5    # stillir adeins upphafsstellingu vorpu
-
-# rammi hnit
-# haegri ofan
-R_HO = np.array([corr_f, -breidd/2, -haed/2]).reshape(3, 1)
-# haegri nedan
-R_HN = np.array([0, -breidd/2, haed/2]).reshape(3, 1)
-# vinstri ofan
-R_VO = np.array([corr_f, breidd/2, -haed/2]).reshape(3, 1)
-# vinstri nedan
-R_VN = np.array([0, breidd/2, haed/2]).reshape(3, 1)
-
-
 # vaengir
 lengd_vaengur = 2.2  # m
 breidd_vaengur = 0.27  # m
 A_vaengur = lengd_vaengur*breidd_vaengur  # m**2
-
-
-# haegri vaengur fjarlaegd fra CO (center of body coordinate system)
-haegri_vaengur_stadsetning_b = np.array([corr_f, -breidd/2+0.4+1.1, -haed/2]).reshape(3, 1)
-
-# vinstri vaengur fjarlaegd fra CO
-vinstri_vaengur_statsetning_b = np.array([corr_f, breidd/2-0.4-1.1, -haed/2]).reshape(3, 1)
-
-################## stadsetningar togvira #####################
-
-
-# stadsetning hanafots (tengipunkts togvira) fra midju ramma i byrjun hermunar
-stadsetning_hanafots_i_byrjun_b = np.array([9, 0, -4]).reshape(3, 1)
-
-
-# haegt ad baeta vid togvirum (eda faekka) her
-
-# haegri ofan
-stadsetning_togvir_haegri_ofan_b = np.array([corr_f, -breidd/4, -haed/2]).reshape(3, 1)
-# haegri nedan
-stadsetning_togvir_haegri_nedan_b = np.array([0, -breidd/2, 0]).reshape(3, 1)
-# vinstri ofan
-stadsetning_togvir_vinstri_ofan_b = np.array([corr_f, breidd/4, -haed/2]).reshape(3, 1)
-# vinstri nedan
-stadsetning_togvir_vinstri_nedan_b = np.array([0, breidd/2, 0]).reshape(3, 1)
-
-# upphafleg lengd efri togvira
-#upphafleg_L_efri_togvira = np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_ofan_b)
-
-# upphafleg lengd nedri togvira
-#upphafleg_L_nedri_togvira = np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_nedan_b)
-
-
-#####  TOGVIRAR = ( (stadsetning togvirs a ramma i body frame, upphafleg lengd togvirs ) , ...)
-TOGVIRAR =((stadsetning_togvir_haegri_ofan_b,    np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_ofan_b)),
-            (stadsetning_togvir_haegri_nedan_b, np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_nedan_b)),
-            (stadsetning_togvir_vinstri_ofan_b, np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_vinstri_ofan_b)),
-            (stadsetning_togvir_vinstri_nedan_b,np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_vinstri_nedan_b)))
-
 
 ####### straumfraedi studlar ######
 

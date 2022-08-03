@@ -72,8 +72,12 @@ hermun = ct.InterconnectedSystem(
         outputs=outputs_A)
 
 
-X0 = np.zeros(12)#[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]                 # Initial H, L
-T = np.linspace(0, 6*60, 5000)   # Simulation 70 years of time
+
+heildartimi = 6*60 # sek
+number_of_solution_points = 5000
+
+X0 = np.array([TOW_hradi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])               # Initial H, L
+T = np.linspace(0, heildartimi, number_of_solution_points)   # Simulation 70 years of time
 
 
 
@@ -106,7 +110,7 @@ else:
     h1 =5./180. * np.pi
     roll_ref=[0 if t <= t1 else h1 * (t-t1) if t <= t1+1  else h1 for t in T]
 
-cl = True
+cl = False
 
 # closed loop
 if cl == True:
