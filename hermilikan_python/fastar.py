@@ -11,8 +11,10 @@ corr_f = 0.0  # -0.5    # stillir adeins upphafsstellingu vorpu
 # stadsetning hanafots (tengipunkts togvira) fra midju ramma i byrjun hermunar
 stadsetning_hanafots_i_byrjun_b = np.array([9, 0, -4]).reshape(3, 1)
 
-RAMMI = False
-STONG = True
+RAMMI = True
+
+# ut af einhverri astaedu tha tekur thad gridarlega langan tima ad reikna fyrir stong
+STONG = False
 
 if RAMMI:
     ### ath aukamassinn er ekki med (ma baeta vid)
@@ -84,7 +86,7 @@ if STONG:
     MRB = np.block([[massi_heild*np.eye(3), np.zeros((3, 3))],
                     [np.zeros((3, 3)), hverfitregduthinur]])
 
-    MA = 0.15*MRB  # + 15 # added mass
+    MA = 0.15*MRB  # + 15% # added mass
 
     M = MRB + MA
 
