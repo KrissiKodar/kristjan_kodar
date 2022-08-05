@@ -11,10 +11,10 @@ corr_f = 0.0  # -0.5    # stillir adeins upphafsstellingu vorpu
 # stadsetning hanafots (tengipunkts togvira) fra midju ramma i byrjun hermunar
 stadsetning_hanafots_i_byrjun_b = np.array([9, 0, -4]).reshape(3, 1)
 
-RAMMI = True
+
 
 # ut af einhverri astaedu tha tekur thad gridarlega langan tima ad reikna fyrir stong
-STONG = False
+RAMMI = False
 
 if RAMMI:
     ### ath aukamassinn er ekki med (ma baeta vid)
@@ -69,9 +69,8 @@ if RAMMI:
                 (stadsetning_togvir_haegri_nedan_b, np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_nedan_b)),
                 (stadsetning_togvir_vinstri_ofan_b, np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_vinstri_ofan_b)),
                 (stadsetning_togvir_vinstri_nedan_b,np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_vinstri_nedan_b)))
-
-if STONG:
-    thykkt_stong = 0.4
+else:
+    thykkt_stong = 1.5
     ### ath aukamassinn er ekki med (ma baeta vid)
     Ixx = (1/12)*(breidd/3)*m_eining*breidd**2
 
@@ -94,27 +93,28 @@ if STONG:
 
     # stong hnit
     # haegri 
-    R_H = np.array([corr_f, -breidd/2, 0]).reshape(3, 1)
+    foo = 0.0
+    R_H = np.array([corr_f, -breidd/2, foo]).reshape(3, 1)
     # vinstri 
-    R_V = np.array([corr_f, breidd/2, 0]).reshape(3, 1)
+    R_V = np.array([corr_f, breidd/2, foo]).reshape(3, 1)
 
 
     # haegri vaengur fjarlaegd fra CO (center of body coordinate system)
-    haegri_vaengur_stadsetning_b = np.array([corr_f, -breidd/2+0.4+1.1, 0]).reshape(3, 1)
+    haegri_vaengur_stadsetning_b = np.array([corr_f, -breidd/2+0.4+1.1, foo]).reshape(3, 1)
 
     # vinstri vaengur fjarlaegd fra CO
-    vinstri_vaengur_statsetning_b = np.array([corr_f, breidd/2-0.4-1.1, 0]).reshape(3, 1)
+    vinstri_vaengur_statsetning_b = np.array([corr_f, breidd/2-0.4-1.1, foo]).reshape(3, 1)
 
     # haegri ofan
-    stadsetning_togvir_haegri_b = np.array([corr_f, -breidd/4, 0]).reshape(3, 1)
+    stadsetning_togvir_haegri_b = np.array([corr_f, -breidd/4, foo]).reshape(3, 1)
     # vinstri ofan
-    stadsetning_togvir_vinstri_b = np.array([corr_f, breidd/4, 0]).reshape(3, 1)
+    stadsetning_togvir_vinstri_b = np.array([corr_f, breidd/4, foo]).reshape(3, 1)
 
     #####  TOGVIRAR = ( (stadsetning togvirs a ramma i body frame, upphafleg lengd togvirs ) , ...)
     TOGVIRAR =((stadsetning_togvir_haegri_b,    np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_haegri_b)),
                 (stadsetning_togvir_vinstri_b, np.linalg.norm(stadsetning_hanafots_i_byrjun_b-stadsetning_togvir_vinstri_b)))
+    print(M)
 
-print(M)
 #### Almennt ####
 flatarmal_op_vorpu = breidd*haed  # flatarmal op vorpu m**2
 
@@ -160,8 +160,8 @@ sidehorn_straums_wrt_co = 0.0        # horn straums vorpu
 
 
 # Low-speed linear damping matrix parameter (kafbatur)
-T1 = 20.0  # 20            # time constant in surge (s)
-T2 = 20.0  # 20            # time constant in sway (s)
+T1 = 5.0  # 20            # time constant in surge (s)
+T2 = 5.0  # 20            # time constant in sway (s)
 zeta4 = 8.0                # relative damping ratio in roll
 zeta5 = 1.0                # relative damping ratio in pitch
 T6 = 5.0                   # time constant in yaw (s)

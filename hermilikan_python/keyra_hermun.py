@@ -74,10 +74,10 @@ hermun = ct.InterconnectedSystem(
 
 
 heildartimi = 6*60 # sek
-number_of_solution_points = 5000
+number_of_solution_points = heildartimi*30
 
-X0 = np.array([TOW_hradi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])               # Initial H, L
-T = np.linspace(0, heildartimi, number_of_solution_points)   # Simulation 70 years of time
+X0 = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])               # Initial H, L
+T = np.linspace(0, heildartimi, number_of_solution_points)   # Simulation time
 
 
 kp = 1.0
@@ -139,6 +139,10 @@ else:
 print('\n')
 print("--- execution time: %s seconds ---" % (time.time() - start_time))
 print('\n')
+
+#np.save('rammi', y)
+#np.save('timi', t)
+#b = np.loadtxt('test1.txt', dtype=int)
 
 plt.show()
 
