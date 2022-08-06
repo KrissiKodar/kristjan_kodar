@@ -9,8 +9,9 @@ std::string decipher(std::string s);
 int max_index(double x);
 void ignoreLine();
 std::string getString();
-char getChar();
+bool yes_or_no();
 int getInt();
+char getChar();
 
 
 void ignoreLine()
@@ -110,16 +111,50 @@ char getChar()
 {
     char x;
     std::cin >> x;
-    ignoreLine();
+    ignoreLine(); // taktu fyrsta char sem sest i stream-inu og hentu rest
     return x;
+}
+
+bool yes_or_no()
+{
+    //std::cout << "Enter a character: ";
+    while (true) // Loop until user enters a valid input
+    {
+        char x;
+        std::cin >> x;
+        ignoreLine();
+        switch (x)
+        {
+        case 'y':
+            return true;
+        case 'n':
+            return false;
+        default: // otherwise tell the user what went wrong
+            std::cerr << "Oops, that input is invalid.  Please try again.\n";
+        }
+    }
 }
 
 int getInt()
 {
-    int x;
-    std::cin >> x;
-    ignoreLine();
-    return x;
+    //std::cout << "Enter an integer: ";
+    while (true) // Loop until user enters a valid input
+    {
+        int x;
+        std::cin >> x;
+        if (!std::cin) // has a previous extraction failed?
+        {
+            // yep, so let's handle the failure
+            std::cin.clear(); // put us back in 'normal' operation mode
+            ignoreLine(); // and remove the bad input
+            std::cerr << "ERROR, not an integer. Try again: ";
+        }
+        else // else our extraction succeeded
+        {
+            ignoreLine();
+            return x; // so return the value we extracted
+        }
+    }
 }
 
 int main()
@@ -142,16 +177,15 @@ int main()
     {
 
         std::cout << "Loop again (y/n)? ";
-        char c{getChar()};
 
-        if (c == 'n')
+        if (!yes_or_no())
             break;
 
         std::cout << "Enter a sentence: " ;
         std::string inp {getString()};
         
         std::cout << "Decipher or shift (d/s)? ";
-        c = getChar();
+        char c{getChar()};
 
         if (c == 'd')
         {
