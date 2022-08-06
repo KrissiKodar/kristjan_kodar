@@ -1,9 +1,22 @@
 #include <iostream>
 #include <string>
+#include <limits> // for std::numeric_limits
+
+
 char warmup(char c, int shift);
 std::string caesar(std::string s, int shift);
 std::string decipher(std::string s);
 int max_index(double x);
+void ignoreLine();
+std::string getString();
+char getChar();
+int getInt();
+
+
+void ignoreLine()
+{
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
 
 int max_index(double x[], int size)
 {
@@ -27,7 +40,7 @@ std::string decipher(std::string s)
     std::string string_array[26]{};
     double averages[26]{};
     double summa {0.0};
-    int temp_c { };
+    char temp_c { };
     std::string temp_s {};
     for( int counter{0} ; counter <= 25; ++counter )
     {
@@ -39,16 +52,17 @@ std::string decipher(std::string s)
                     continue;
             else if ('A' <= temp_c && temp_c <= 'Z')
                 {
-                    summa += let_freq[temp_c-65];
+                    summa += let_freq[temp_c-'A'];
                 }
             else
-                summa += let_freq[temp_c-97];
+                summa += let_freq[temp_c-'a'];
         }
         summa = summa/temp_s.length();
         averages[counter] = summa;
         string_array[counter] = temp_s;
+        
     }
-    return string_array[max_index(averages,sizeof(averages))];
+    return string_array[max_index(averages,sizeof(averages)/sizeof(double))];
 }
 
 char warmup(char c, int shift)
@@ -85,6 +99,28 @@ std::string caesar(std::string s, int shift)
     return temp_s;
 }
 
+std::string getString()
+{   
+    std::string x;
+    getline(std::cin, x);
+    return x;
+}
+
+char getChar()
+{
+    char x;
+    std::cin >> x;
+    ignoreLine();
+    return x;
+}
+
+int getInt()
+{
+    int x;
+    std::cin >> x;
+    ignoreLine();
+    return x;
+}
 
 int main()
 {
@@ -95,10 +131,40 @@ int main()
     caesar("fusion", 6);
     caesar("Daily programmer", 6);
     caesar("Jgore vxumxgsskx", -6); */
-    std::cout << decipher("Zol abyulk tl puav h ulda.") << '\n';
+
+   /*  std::cout << decipher("Zol abyulk tl puav h ulda.") << '\n';
     std::cout << decipher("Tfdv ef wlikyvi, wfi uvrky rnrzkj pfl rcc nzky erjkp, szx, gfzekp kvvky.") << '\n';
     std::cout << decipher("Qv wzlmz bw uiqvbiqv iqz-axmml dmtwkqbg, i aeittwe vmmla bw jmib qba eqvoa nwzbg-bpzmm bquma mdmzg amkwvl, zqopb?") << '\n';
-    std::cout << decipher("rypzaqhu vyyp khkhzvu") << '\n' << '\n';
+    std::cout << decipher("rypzaqhu vyyp khkhzvu") << '\n' << '\n'; */
+
     
+    while (true)
+    {
+
+        std::cout << "Loop again (y/n)? ";
+        char c{getChar()};
+
+        if (c == 'n')
+            break;
+
+        std::cout << "Enter a sentence: " ;
+        std::string inp {getString()};
+        
+        std::cout << "Decipher or shift (d/s)? ";
+        c = getChar();
+
+        if (c == 'd')
+        {
+            std::cout << decipher(inp) << '\n'; 
+        }
+        else
+        {
+        std::cout << "Shift by how many places: ";
+        int enc {getInt()};
+        std::cout <<  "The encrypted sentence is " << caesar(inp, enc) << '\n';
+        }
+    }
+    
+    std::cout <<  "See you later! ";
     return 0;
 }
