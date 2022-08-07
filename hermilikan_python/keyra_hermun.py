@@ -79,12 +79,38 @@ number_of_solution_points = heildartimi*30
 X0 = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])               # Initial H, L
 T = np.linspace(0, heildartimi, number_of_solution_points)   # Simulation time
 
-
+# PID controller parameters
 kp = 1.0
 ki = 0.0
 kd = 0.0
 N = 1.0  # filter coefficient
 
+
+# function that returns list of multiple step functions
+def step_functions(t, t_step, y_step):
+    """roll_ref sem fall af tima
+
+    Args:
+        t (list): time list
+        t_step (list): timi thar sem step kickar inn
+        y_step (list): staerd steps
+
+    Returns:
+        list: compound step function
+    """
+    step_functions = []
+    for i in range(len(t_step)):
+        step_functions.append(np.piecewise(t, [t < t_step[i], t >= t_step[i]], [0, y_step[i]]))
+    # sum all lists in list
+    step_sum = np.sum(step_functions, axis=0)
+    return step_sum
+
+# function that plots a list with respect to time
+def plot_time(t, list, title):
+    plt.plot(t, list)
+    plt.title(title)
+    plt.grid(True)
+    plt.show()
 
 # Simulate the system
 temp = True
@@ -93,23 +119,25 @@ if temp == True:
     h1 =5./180. * np.pi
 
     t2 = 149
-    h2 =10./180. * np.pi
+    h2 =5./180. * np.pi
 
     t3 = 190
-    h3 =15./180. * np.pi
+    h3 =5./180. * np.pi
 
     t4 = 236
+    h4 =-15./180. * np.pi
 
-    roll_ref = [0 if t <= t1 else h1 * (t-t1) if t <= t1+1  else h1 
-    if t <= t2 else h1 * (t-t2) + h1 if t <= t2+1 else h2 
-    if t <= t3 else h1 * (t-t3) + h2 if t <= t3+1 else h3  
-    if t <= t4 else 0  for t in T]
+    t_step = [t1,t2,t3,t4]
+    y_step = [h1,h2,h3,h4]
+    # refrence values fyrir roll (phi) a vorpunni
+    roll_ref = step_functions(T, t_step, y_step)
 else:
     t1 = 60
     h1 =5./180. * np.pi
-    roll_ref=[0 if t <= t1 else h1 * (t-t1) if t <= t1+1  else h1 for t in T]
+    #roll_ref=[0 if t <= t1 else h1 * (t-t1) if t <= t1+1  else h1 for t in T]
+    roll_ref = step_functions(T, [t1], [h1])
 
-cl = False
+cl = True
 
 # closed loop
 if cl == True:
@@ -124,6 +152,7 @@ if cl == True:
     plt.legend()
     plt.grid(True)
     print(np.shape(y))
+    plt.show()
 else:
     # open loop
     vaeng_horn = 5
@@ -134,6 +163,7 @@ else:
     plt.plot(t, y[9]*180/np.pi,'r',label = f"roll, u = {vaeng_horn} deg")
     plt.legend()
     plt.grid(True)
+    plt.show()
 
 
 print('\n')
@@ -144,11 +174,26 @@ print('\n')
 #np.save('timi', t)
 #b = np.loadtxt('test1.txt', dtype=int)
 
-plt.show()
+# function that converts specific indexes of list to degrees
+def deg(list, indexes):
+    for i in indexes:
+        list[i] = list[i] * 180 / np.pi
+    return list
 
+y = deg(y, [3,4,5,9,10,11])
 
+# function that plots all the states as a function of time with subplots 3x4
+def plot_states(t, y, states):
+    fig, axes = plt.subplots(4, 3, figsize=(12, 8))
+    for i in range(len(states)):
+        axes[i//3, i%3].plot(t, y[i])
+        axes[i//3, i%3].set_title(states[i])
+        axes[i//3, i%3].grid(True)
+        axes[i//3, i%3].sharex(axes[0, i%3])
+    fig.tight_layout()
+    plt.show()
 
-
+plot_states(t, y, states_A[0:12])
 
 #### sma ad profa ####
 """ # xyz_hnit = np.vstack((HO_X, HN_X, VO_X, VN_X))
@@ -162,49 +207,3 @@ for i in range(len(t)):
     B=y[7:10][i]+R@(R_HN)
     C=y[7:10][i]+R@(R_VO)
     D=y[7:10][i]+R@(R_VN) """
-
-
-
-##### plotta oll state variables #####
-
-fig, axs = plt.subplots(4, 3)
-axs[0, 0].plot(t, y[0])
-axs[0, 0].set_title("u")
-axs[0, 1].plot(t, y[1])
-axs[0, 1].set_title("v")
-axs[0, 2].plot(t, y[2])
-axs[0, 2].set_title("w")
-
-axs[1, 0].plot(t, y[3]*180/np.pi)
-axs[1, 0].set_title("p")
-axs[1, 0].sharex(axs[0, 0])
-axs[1, 1].plot(t, y[4]*180/np.pi)
-axs[1, 1].set_title("q")
-axs[1, 1].sharex(axs[0, 1])
-axs[1, 2].plot(t, y[5]*180/np.pi)
-axs[1, 2].set_title("r")
-axs[1, 2].sharex(axs[0, 2])
-
-axs[2, 0].plot(t, y[6])
-axs[2, 0].set_title("x")
-axs[2, 0].sharex(axs[0, 0])
-axs[2, 1].plot(t, y[7])
-axs[2, 1].set_title("y")
-axs[2, 1].sharex(axs[0, 1])
-axs[2, 2].plot(t, y[8])
-axs[2, 2].set_title("z")
-axs[2, 2].sharex(axs[0, 2])
-
-axs[3, 0].plot(t, y[9]*180/np.pi)
-axs[3, 0].set_title("phi")
-axs[3, 0].sharex(axs[0, 0])
-axs[3, 1].plot(t, y[10]*180/np.pi)
-axs[3, 1].set_title("theta")
-axs[3, 1].sharex(axs[0, 1])
-axs[3, 2].plot(t, y[11]*180/np.pi)
-axs[3, 2].set_title("psi")
-axs[3, 2].sharex(axs[0, 2])
-
-fig.tight_layout()
-
-plt.show()
