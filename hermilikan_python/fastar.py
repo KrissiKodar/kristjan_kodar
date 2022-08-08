@@ -14,7 +14,7 @@ stadsetning_hanafots_i_byrjun_b = np.array([9, 0, -4]).reshape(3, 1)
 
 
 # ut af einhverri astaedu tha tekur thad gridarlega langan tima ad reikna fyrir stong
-RAMMI = False
+RAMMI = True
 
 if RAMMI:
     ### ath aukamassinn er ekki med (ma baeta vid)

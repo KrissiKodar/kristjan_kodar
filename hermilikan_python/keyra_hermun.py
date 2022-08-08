@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib import animation
 import time
 from foll import *
 from fastar import *
@@ -137,7 +138,7 @@ else:
     #roll_ref=[0 if t <= t1 else h1 * (t-t1) if t <= t1+1  else h1 for t in T]
     roll_ref = step_functions(T, [t1], [h1])
 
-cl = True
+cl = False
 
 # closed loop
 if cl == True:
@@ -194,16 +195,48 @@ def plot_states(t, y, states):
     plt.show()
 
 plot_states(t, y, states_A[0:12])
+fig = plt.figure()
+ax = fig.add_subplot(111,projection='3d')
 
-#### sma ad profa ####
-""" # xyz_hnit = np.vstack((HO_X, HN_X, VO_X, VN_X))
 
-#rammi_xyz_hnit = np.vstack(
-#    (o_b + R@R_HO, o_b + R@R_HN,  o_b + R@R_VO, o_b + R@R_VN))
+ax.set_title('3D animation')
+#ax.view_init(elev=30, azim=30)
+             
+def animate(i):
+    ax.clear()
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    ax.set_xlim3d(-10+TOW_hradi*t[i], 10+TOW_hradi*t[i])
+    ax.set_ylim3d(-10, 10)
+    ax.set_zlim3d(-10, 10)
+    #ax.clear()
+    [J, R, T_tf] = eulerang(y[9][i], y[10][i], y[11][i])
+    o_b = np.array([y[6][i],y[7][i],-y[8][i]]).reshape(3,1)
+    A = (o_b+R@(R_HO)).flatten()
+    B = (o_b+R@(R_HN)).flatten()
+    C = (o_b+R@(R_VO)).flatten()
+    D = (o_b+R@(R_VN)).flatten()
+    #print(A)
+    #print(B)
+    #print(C)
+    #print(D)
+    ax.plot([A[0],B[0]], [A[1],B[1]], [A[2],B[2]], 'b')
+    ax.plot([A[0],C[0]], [A[1],C[1]], [A[2],C[2]], 'r')
+    ax.plot([C[0],D[0]], [C[1],D[1]], [C[2],D[2]], 'g')
+    ax.plot([B[0],D[0]], [B[1],D[1]], [B[2],D[2]], 'r')
+    
 
-for i in range(len(t)):
-    [J, R, T_tf] = eulerang(y[10][i], y[11][i], y[12][i])
-    A=y[7:10][i]+R@(R_HO)
-    B=y[7:10][i]+R@(R_HN)
-    C=y[7:10][i]+R@(R_VO)
-    D=y[7:10][i]+R@(R_VN) """
+    
+    #plt.pause(0.01)
+    #plt.autoscale(enable=True, axis='both')
+
+# function that uses matplotlib.animation to animate the lists with respect to time
+
+R_HO[2,0] = -R_HO[2,0]
+R_HN[2,0] = -R_HN[2,0]
+R_VO[2,0] = -R_VO[2,0]
+R_VN[2,0] = -R_VN[2,0]
+
+ani = animation.FuncAnimation(fig, animate, frames=len(t), interval=1)
+plt.show()
