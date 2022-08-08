@@ -166,7 +166,6 @@ else:
     plt.grid(True)
     plt.show()
 
-
 print('\n')
 print("--- execution time: %s seconds ---" % (time.time() - start_time))
 print('\n')
@@ -180,8 +179,8 @@ def deg(list, indexes):
     for i in indexes:
         list[i] = list[i] * 180 / np.pi
     return list
-
-y = deg(y, [3,4,5,9,10,11])
+y_temp = np.copy(y)
+y_deg = deg(y_temp, [3,4,5,9,10,11])
 
 # function that plots all the states as a function of time with subplots 3x4
 def plot_states(t, y, states):
@@ -194,22 +193,22 @@ def plot_states(t, y, states):
     fig.tight_layout()
     plt.show()
 
-plot_states(t, y, states_A[0:12])
+plot_states(t, y_deg, states_A[0:12])
 fig = plt.figure()
 ax = fig.add_subplot(111,projection='3d')
 
-
-ax.set_title('3D animation')
 #ax.view_init(elev=30, azim=30)
-             
+
 def animate(i):
     ax.clear()
+    ax.set_title('3D animation')
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel('z')
     ax.set_xlim3d(-10+TOW_hradi*t[i], 10+TOW_hradi*t[i])
     ax.set_ylim3d(-10, 10)
     ax.set_zlim3d(-10, 10)
+    
     #ax.clear()
     [J, R, T_tf] = eulerang(y[9][i], y[10][i], y[11][i])
     o_b = np.array([y[6][i],y[7][i],-y[8][i]]).reshape(3,1)
@@ -217,14 +216,24 @@ def animate(i):
     B = (o_b+R@(R_HN)).flatten()
     C = (o_b+R@(R_VO)).flatten()
     D = (o_b+R@(R_VN)).flatten()
-    #print(A)
-    #print(B)
-    #print(C)
-    #print(D)
-    ax.plot([A[0],B[0]], [A[1],B[1]], [A[2],B[2]], 'b')
+    tp = (stadsetning_hanafots_i_byrjun_b + np.array([TOW_hradi*t[i], 0, 0]).reshape(3,1)).flatten()
+
+    E = (o_b+R@(stadsetning_togvir_haegri_ofan_b)).flatten()
+    F = (o_b+R@(stadsetning_togvir_haegri_nedan_b)).flatten()
+    G = (o_b+R@(stadsetning_togvir_vinstri_ofan_b)).flatten()
+    H = (o_b+R@(stadsetning_togvir_vinstri_nedan_b)).flatten()
+
+    ax.plot([A[0],B[0]], [A[1],B[1]], [A[2],B[2]], 'r')
     ax.plot([A[0],C[0]], [A[1],C[1]], [A[2],C[2]], 'r')
-    ax.plot([C[0],D[0]], [C[1],D[1]], [C[2],D[2]], 'g')
+    ax.plot([C[0],D[0]], [C[1],D[1]], [C[2],D[2]], 'r')
     ax.plot([B[0],D[0]], [B[1],D[1]], [B[2],D[2]], 'r')
+
+    ax.plot([E[0],tp[0]], [E[1],tp[1]], [E[2],tp[2]], 'b')
+    ax.plot([F[0],tp[0]], [F[1],tp[1]], [F[2],tp[2]], 'b')
+    ax.plot([G[0],tp[0]], [G[1],tp[1]], [G[2],tp[2]], 'b')
+    ax.plot([H[0],tp[0]], [H[1],tp[1]], [H[2],tp[2]], 'b')
+
+
     
 
     
@@ -232,11 +241,15 @@ def animate(i):
     #plt.autoscale(enable=True, axis='both')
 
 # function that uses matplotlib.animation to animate the lists with respect to time
-
 R_HO[2,0] = -R_HO[2,0]
 R_HN[2,0] = -R_HN[2,0]
 R_VO[2,0] = -R_VO[2,0]
 R_VN[2,0] = -R_VN[2,0]
+stadsetning_togvir_haegri_ofan_b[2,0] = -stadsetning_togvir_haegri_ofan_b[2,0]
+stadsetning_togvir_haegri_nedan_b[2,0] = -stadsetning_togvir_haegri_nedan_b[2,0]
+stadsetning_togvir_vinstri_ofan_b[2,0] = -stadsetning_togvir_vinstri_ofan_b[2,0]
+stadsetning_togvir_vinstri_nedan_b[2,0] = -stadsetning_togvir_vinstri_nedan_b[2,0]
+stadsetning_hanafots_i_byrjun_b[2,0] = -stadsetning_hanafots_i_byrjun_b[2,0]
 
 ani = animation.FuncAnimation(fig, animate, frames=len(t), interval=1)
 plt.show()
